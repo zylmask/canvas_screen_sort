@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>canvas</title>
+    <style>
+        body{
+            box-sizing: border-box;
+        }
+        *{
+            text-align: center;
+            margin:0;
+        }
+        #container{
+            width: 800px;
+            height: 400px;
+            margin: 0 auto;
+            z-index: 100;
+            position: relative;
+        }
+        .img{
+            width: 100%;
+            height: 100%;
+            z-index: 200;
+            background: url("yuji.jpg") no-repeat;
+            background-size: cover;
+            position: absolute;
+            top:0;
+            left:0;
+        }
+
+        canvas{
+            position: absolute;
+            z-index: 300;
+            top:0;
+            left:0;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div class="bbox">
+            <img src="yuji.jpg" alt="" class="img" id="getImg">
+            <canvas id="myCanvas">
+
+            </canvas>
+        </div>
+        <img id="showImg" alt="" style="position: fixed;
+top: 500px;left: 0;width:800px; height: 400px;">
+    </div>
+    <script>
+        if (sessionStorage.dataUrl){
+            document.getElementById('showImg').src = sessionStorage.dataUrl
+        }
+        let canvas = document.getElementById('myCanvas')
+        canvas.width = 800
+        canvas.height = 400
+        let bbox = canvas.getBoundingClientRect()
+        let dataUrl = ''
+        let ox = null,
+            oy = null,
+            ex = null,
+            ey = null
+        let drawImg = new Image()
+        drawImg.setAttribute('crossOrigin', 'anonymous');
+        let img2 = document.getElementById('getImg')
+        let ctx = canvas.getContext('2d')
+        let ctx2 = ctx
+        ctx.clearRect(0, 0, 800, 400)
+        ctx.strokeStyle="rgba(0,0,255,1)";
+        ctx.lineWidth=1
+        // 给图片先转码
+        clear()
+        function clear() {
+            ctx.clearRect(0, 0, 800, 400)
+        }
+        // 获取鼠标的 X， y
+        function getClient(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            let numa, numb
+            numa = (e.clientX - bbox.left) * (canvas.width / bbox.width)
+            numb = (e.clientY - bbox.top) * (canvas.height / bbox.height)
+            ox = parseInt(numa)
+            oy=parseInt(numb)
+            if (ox>canvas.width) {
+               // console.log('11')
+                ox = canvas.width
+            } else if(ox < 0){
+                ox = 0
+            }
+            if (oy>canvas.height){
+                oy = canvas.height
+            } else if(oy < 0) {
+                oy = 0
+            }
+           // console.log(ox,oy)
+        }
+        canvas.addEventListener('mousedown', function (elent) {
+          clear()
+            //console.log(elent, img2, ctx)
+          var img3 = new Image
+          img3.src = 'yuji.jpg'
+          img3.onload=function () {
+            console.log(img3,img3.width , img3.height)
+            ctx.fillStyle = ctx.createPattern(img3, 'repeat')
+            ctx.drawImage(img3,0,0,img3.width,img3.height, 0, 0, 800, 400)
+
+          }
+          getClient(elent)
+        })
+        canvas.addEventListener('mouseup',function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var ax, aY
+            ax = (e.clientX - bbox.left) * (canvas.width / bbox.width)
+            ay = (e.clientY - bbox.top) * (canvas.height / bbox.height)
+            ex = parseInt(ax)
+            ey = parseInt(ay)
+            //console.log(ex, ey)
+            let w = ex-ox,
+                h = ey-oy
+            //console.log("ox: ",ox,"oy：", oy)
+            ctx.strokeRect(parseFloat(ox), parseFloat(oy), w, h)
+            //console.log(canvas)
+            setTimeout(function () {
+              dataUrl=canvas.toDataURL('image/jpeg')
+              document.getElementById('showImg').src = dataUrl
+              sessionStorage.dataUrl = dataUrl
+            },3000)
+        })
+    </script>
+</body>
+</html>
